@@ -1,0 +1,2 @@
+# ai_podcast_by_nijivoice
+にじボイスAPIを利用したAIポッドキャスト作成ツールの試作です
