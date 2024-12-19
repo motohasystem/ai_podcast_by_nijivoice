@@ -10,8 +10,8 @@ class MP3Generator:
         self.config = config
         # speakerとEnvConfの定数のID_CHAR_01の対応を定義する辞書
         self.speaker_id_map = {
-            "武士": self.config.ID_CHAR_01,
-            "運転手": self.config.ID_CHAR_02,
+            "お兄さん": self.config.ID_CHAR_01,
+            "お姉さん": self.config.ID_CHAR_02,
             # 必要に応じて他のスピーカーとIDを追加
         }
 
@@ -33,7 +33,8 @@ class MP3Generator:
         # speaker_idを取得
         speaker_id = self.speaker_id_map.get(speaker)
         if not speaker_id:
-            print(f"スピーカーIDが見つかりません: {speaker}")
+            print(f"ERROR: スピーカー文字列[{speaker}]が見つかりません。")
+            exit(1)
             return
 
         # APIキーを取得
