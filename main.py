@@ -1,20 +1,10 @@
 import os
 import sys
-import json
-from dotenv import load_dotenv
+
+# import json
+from ai_podcast_by_nijivoice.env_config import EnvConfig
 from mp3_generator import MP3Generator
 from mp3_concatenator import MP3Concatenator
-
-class EnvConfig:
-    """
-    環境変数を管理するクラス。
-    初期化時に環境変数をロードし、必要な値を設定します。
-    """
-    def __init__(self):
-        load_dotenv()
-        self.API_KEY = os.getenv("API_KEY")
-        self.ID_CHAR_01 = os.getenv("ID_CHAR_01")
-        self.ID_CHAR_02 = os.getenv("ID_CHAR_02")
 
 if __name__ == "__main__":
     # 環境変数をロードして設定を作成します。
