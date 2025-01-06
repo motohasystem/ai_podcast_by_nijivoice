@@ -9,16 +9,25 @@ class OpenAIGenerator:
         self.api_key = api_key
         self.model = model
 
-    def generate_text(self, prompt_file_path):
+    def generate_text(self, prompt_file_path, systemprompt_file_path=""):
         # 指定されたmdファイルを読み込み、プロンプトとして使用します。
         with open(prompt_file_path, "r", encoding="utf-8") as file:
             prompt = file.read()
 
+        if systemprompt_file_path:
+            with open(systemprompt_file_path, "r", encoding="utf-8") as file:
+                system_prompt = file.read()
+        else:
+            system_prompt = ""
+
         # OpenAI APIを使用してテキストを生成します。
-        response = self.call_openai_api(prompt)
+        response = self.call_openai_api(prompt, system_prompt)
         return response
 
-    def call_openai_api(self, prompt):
+    def call_openai_api(self, prompt, system_prompt=""):
+        """
+        OpenAI APIを使用してテキストを生成します。
+        """
         import openai
 
         openai.api_key = self.api_key
@@ -42,8 +51,8 @@ class OpenAIGenerator:
                                         "type": "string",
                                         "description": "The name of the speaker.",
                                         "enum": [
-                                            "お姉さん（おちゃらけた運転手）",
-                                            "お兄さん（落ち着いた雰囲気の武士）",
+                                            "Grreka",
+                                            "Jelly",
                                         ],
                                     },
                                     "line": {
@@ -62,19 +71,30 @@ class OpenAIGenerator:
             },
         }
 
-        try:
+        # プロンプト用のメッセージを作成
+        messages = [
+            {
+                "role": "user",
+                "content": [{"type": "text", "text": prompt}],
+            },
+        ]
+        if system_prompt != "":
+            messages.insert(
+                0,
+                {
+                    "role": "system",
+                    "content": system_prompt,
+                },
+            )
 
+        try:
             response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {
-                        "role": "user",
-                        "content": [{"type": "text", "text": prompt}],
-                    }
-                ],
+                model="gpt-4o",
+                # model="gpt-4o-mini",
+                messages=messages,  # type: ignore
                 response_format=json_schema,  # type: ignore
                 temperature=1,
-                max_completion_tokens=2048,
+                max_completion_tokens=4096,
                 top_p=1,
                 frequency_penalty=0,
                 presence_penalty=0,
@@ -87,12 +107,29 @@ class OpenAIGenerator:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3:
-        print("使用方法: python call_openai.py <prompt_file_path> <output_json_file>")
-        sys.exit(1)
+    import argparse
 
-    prompt_file_path = sys.argv[1]
-    output_json_file = sys.argv[2]
+    parser = argparse.ArgumentParser(
+        description="OpenAI APIを使用してテキストを生成します。"
+    )
+    parser.add_argument(
+        "--prompt_file",
+        required=True,
+        help="プロンプトファイルのパスを指定します。",
+    )
+    parser.add_argument(
+        "--output_file",
+        required=True,
+        help="生成されたテキストを保存するJSONファイルのパスを指定します。",
+    )
+    parser.add_argument(
+        "--system_prompt_file",
+        required=False,
+        default="",
+        help="システムプロンプトを指定するオプションです。",
+    )
+
+    args = parser.parse_args()
 
     # 環境変数からAPIキーを取得
     api_key = os.getenv("OPENAI_API_KEY")
@@ -102,7 +139,7 @@ if __name__ == "__main__":
 
     # OpenAIGeneratorを初期化してテキストを生成
     generator = OpenAIGenerator(api_key)
-    generated_text = generator.generate_text(prompt_file_path)
+    generated_text = generator.generate_text(args.prompt_file, args.system_prompt_file)
 
     if generated_text:
         print("生成されたテキスト:")
@@ -110,12 +147,12 @@ if __name__ == "__main__":
 
         # 生成されたテキストをJSON形式で保存
         try:
-            with open(output_json_file, "w", encoding="utf-8") as json_file:
+            with open(args.output_file, "w", encoding="utf-8") as json_file:
                 json_file.write(
                     json.dumps(json.loads(generated_text), indent=4, ensure_ascii=False)
                 )
 
-            print(f"生成されたテキストが{output_json_file}に保存されました。")
+            print(f"生成されたテキストが{args.output_file}に保存されました。")
         except Exception as e:
             print(f"JSONファイル保存エラー: {e}")
     else:

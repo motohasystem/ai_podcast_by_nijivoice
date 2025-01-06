@@ -42,13 +42,12 @@ class MP3Generator:
 
 ## jsonの作り方
 
-ChatGPTに渡したプロンプトを同梱します。
+同梱したcall_openai.py を利用します。
 
-    > 会話JSON作成プロンプト.md
+    $ python call_openai.py --prompt_file prompt.md --system_prompt_file system.md --output_file dialogue.json
 
 [12月.json] と同じような構造を持ったjsonが出力されれば成功です。
 
-うまくいかない場合はプロンプトを調整したり、apiのjson modeを使ったりしてみてください。
 
 ## 利用API
 

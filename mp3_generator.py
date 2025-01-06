@@ -2,18 +2,24 @@ import os
 import json
 import requests
 
+
 class MP3Generator:
     """
     JSONデータからMP3ファイルを生成する機能を提供するクラス。
     """
-    def __init__(self, config):
+
+    def __init__(self, config, speaker_id_map=None):
         self.config = config
         # speakerとEnvConfの定数のID_CHAR_01の対応を定義する辞書
-        self.speaker_id_map = {
-            "お兄さん": self.config.ID_CHAR_01,
-            "お姉さん": self.config.ID_CHAR_02,
-            # 必要に応じて他のスピーカーとIDを追加
-        }
+
+        if speaker_id_map:
+            self.speaker_id_map = speaker_id_map
+        else:
+            self.speaker_id_map = {
+                "お兄さん": self.config.ID_CHAR_01,
+                "お姉さん": self.config.ID_CHAR_02,
+                # 必要に応じて他のスピーカーとIDを追加
+            }
 
     def text_to_mp3(self, text, speaker, output_file):
         """
@@ -67,15 +73,11 @@ class MP3Generator:
         """
         url = f"https://api.nijivoice.com/api/platform/v1/voice-actors/{speaker_id}/generate-voice"
 
-        payload = {
-            "format": "mp3",
-            "script": text,
-            "speed": "1.0"
-        }
+        payload = {"format": "mp3", "script": text, "speed": "1.0"}
         headers = {
             "accept": "application/json",
             "content-type": "application/json",
-            "x-api-key": api_key
+            "x-api-key": api_key,
         }
 
         try:
@@ -97,7 +99,7 @@ class MP3Generator:
         try:
             response = requests.get(url, stream=True)
             response.raise_for_status()
-            with open(output_file, 'wb') as file:
+            with open(output_file, "wb") as file:
                 for chunk in response.iter_content(chunk_size=8192):
                     file.write(chunk)
             print(f"ダウンロード完了: {output_file}")
@@ -116,17 +118,17 @@ class MP3Generator:
         os.makedirs(output_folder, exist_ok=True)
 
         # JSONファイルを読み込みます。
-        with open(json_file, 'r', encoding='utf-8') as file:
+        with open(json_file, "r", encoding="utf-8") as file:
             data = json.load(file)
 
         # "dialogue"キーが存在するか確認します。
-        if 'dialogue' not in data:
+        if "dialogue" not in data:
             raise ValueError("JSONファイルに'dialogue'キーが必要です。")
 
         # 各ダイアログノードを処理します。
-        for idx, node in enumerate(data['dialogue'], start=1):
-            speaker = node.get('speaker', 'Unknown')
-            line = node.get('line', '')
+        for idx, node in enumerate(data["dialogue"], start=1):
+            speaker = node.get("speaker", "Unknown")
+            line = node.get("line", "")
 
             # MP3ファイル名を構築します。
             output_file = os.path.join(output_folder, f"{idx:03d}_{speaker}.mp3")

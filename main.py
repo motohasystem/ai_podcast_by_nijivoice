@@ -2,7 +2,7 @@ import os
 import sys
 
 # import json
-from ai_podcast_by_nijivoice.env_config import EnvConfig
+from env_config import EnvConfig
 from mp3_generator import MP3Generator
 from mp3_concatenator import MP3Concatenator
 
@@ -18,8 +18,14 @@ if __name__ == "__main__":
     input_json = sys.argv[1]
     output_dir = sys.argv[2]
 
+    speaker_id_map = {
+        "Jelly": config.ID_CHAR_01,
+        "Grreka": config.ID_CHAR_02,
+        # 必要に応じて他のスピーカーとIDを追加
+    }
+
     # MP3Generatorインスタンスを作成して処理を実行します。
-    generator = MP3Generator(config)
+    generator = MP3Generator(config, speaker_id_map)
 
     try:
         generator.process_json_to_mp3(input_json, output_dir)
