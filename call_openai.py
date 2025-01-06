@@ -72,7 +72,7 @@ class OpenAIGenerator:
                         "content": [{"type": "text", "text": prompt}],
                     }
                 ],
-                response_format=json_schema,
+                response_format=json_schema,  # type: ignore
                 temperature=1,
                 max_completion_tokens=2048,
                 top_p=1,
@@ -115,13 +115,6 @@ if __name__ == "__main__":
                     json.dumps(json.loads(generated_text), indent=4, ensure_ascii=False)
                 )
 
-                # json_file.write(generated_text)
-                # json.dump(
-                #     {"generated_text": generated_text},
-                #     json_file,
-                #     ensure_ascii=False,
-                #     indent=4,
-                # )
             print(f"生成されたテキストが{output_json_file}に保存されました。")
         except Exception as e:
             print(f"JSONファイル保存エラー: {e}")
