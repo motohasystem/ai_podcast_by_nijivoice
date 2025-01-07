@@ -9,6 +9,11 @@ class TextGenerator:
     def __init__(self, api_key):
         self.generator = OpenAIGenerator(api_key)
         self.alert_words = []
+        self.schema_json = None  # JSONスキーマファイルのパス
+
+    def set_schema_json(self, schema_json):
+        self.schema_json = schema_json
+        self.generator.schema_json = schema_json
 
     def run(self):
         self.generate_and_save_text(
@@ -119,6 +124,12 @@ if __name__ == "__main__":
         default="",
         help="辞書ファイルのパスを指定するオプションです。",
     )
+    parser.add_argument(
+        "--schema_json",
+        required=False,
+        default="",
+        help="JSONスキーマを定義したJSONファイルを指定するオプションです。",
+    )
 
     args = parser.parse_args()
 
@@ -130,7 +141,12 @@ if __name__ == "__main__":
 
     # TextGeneratorを初期化してテキストを生成
     generator = TextGenerator(api_key)
-    # generator.run()
+
+    # JSONスキーマが指定されている場合は、スキーマファイルパスをgeneratorにセットする
+    if args.schema_json:
+        generator.set_schema_json(args.schema_json)
+
+    generator.run()
 
     # 生成されたテキストを処理
     output_treated = args.output_file.replace(".json", "_treated.json")

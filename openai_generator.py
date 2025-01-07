@@ -1,3 +1,4 @@
+import json
 from openai import OpenAI  # type: ignore
 
 
@@ -5,6 +6,7 @@ class OpenAIGenerator:
     def __init__(self, api_key, model="gpt-4o-mini"):
         self.api_key = api_key
         self.model = model
+        self.schema_json = None
 
     def generate_text(self, prompt_file_path, systemprompt_file_path=""):
         # 指定されたmdファイルを読み込み、プロンプトとして使用します。
@@ -30,43 +32,52 @@ class OpenAIGenerator:
         openai.api_key = self.api_key
         client = OpenAI()
 
-        json_schema = {
-            "type": "json_schema",
-            "json_schema": {
-                "name": "dialogue_schema",
-                "strict": True,
-                "schema": {
-                    "type": "object",
-                    "properties": {
-                        "dialogue": {
-                            "type": "array",
-                            "description": "A collection of dialogue entries.",
-                            "items": {
-                                "type": "object",
-                                "properties": {
-                                    "speaker": {
-                                        "type": "string",
-                                        "description": "The name of the speaker.",
-                                        "enum": [
-                                            "Grreka",
-                                            "Jelly",
-                                        ],
+        # JSONスキーマが設定されている場合は、スキーマファイルを読み込んでスキーマとして使用します。
+        if self.schema_json:
+            # ファイルを読み込む
+            with open(self.schema_json, "r", encoding="utf-8") as file:
+                json_schema = json.load(file)
+                # print(json_schema)
+                # exit(0)
+        else:
+            # 未指定の場合はデフォルトのスキーマを使用します。
+            json_schema = {
+                "type": "json_schema",
+                "json_schema": {
+                    "name": "dialogue_schema",
+                    "strict": True,
+                    "schema": {
+                        "type": "object",
+                        "properties": {
+                            "dialogue": {
+                                "type": "array",
+                                "description": "A collection of dialogue entries.",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "speaker": {
+                                            "type": "string",
+                                            "description": "The name of the speaker.",
+                                            "enum": [
+                                                "Grreka",
+                                                "Jelly",
+                                            ],
+                                        },
+                                        "line": {
+                                            "type": "string",
+                                            "description": "The line spoken by the speaker.",
+                                        },
                                     },
-                                    "line": {
-                                        "type": "string",
-                                        "description": "The line spoken by the speaker.",
-                                    },
+                                    "required": ["speaker", "line"],
+                                    "additionalProperties": False,
                                 },
-                                "required": ["speaker", "line"],
-                                "additionalProperties": False,
-                            },
-                        }
+                            }
+                        },
+                        "required": ["dialogue"],
+                        "additionalProperties": False,
                     },
-                    "required": ["dialogue"],
-                    "additionalProperties": False,
                 },
-            },
-        }
+            }
 
         # プロンプト用のメッセージを作成
         messages = [
