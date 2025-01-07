@@ -43,34 +43,19 @@ main.py をそのまま呼び出すと使用方法を出力します。
     $ python speech.py 12月.json dialogue
 
 jsonの話者の名前は手抜きしてハードコードしてしまっています。
-生成されたJSONに合わせて[mp3_generator.py]のコンストラクタを書き換えてください。
+生成されたJSONに合わせて[speech.py]の設定を書き換えてください。
 
 ```python
-class MP3Generator:
-    """
-    JSONデータからMP3ファイルを生成する機能を提供するクラス。
-    """
-    def __init__(self, config):
-        self.config = config
-        # speakerとEnvConfの定数のID_CHAR_01の対応を定義する辞書
-        self.speaker_id_map = {
-            "武士": self.config.ID_CHAR_01,
-            "運転手": self.config.ID_CHAR_02,
-            # 必要に応じて他のスピーカーとIDを追加
-        }
+    # にじボイスのキャラクターIDとスピーカー名のマッピングを作成します。
+    speaker_id_map = {
+        "Jelly": config.ID_CHAR_01,
+        "Grreka": config.ID_CHAR_02,
+        # 必要に応じて他のスピーカーとIDを追加
+    }
 ```
 
 
-## jsonの作り方
-
-同梱したcall_openai.py を利用します。
-
-    $ python call_openai.py --prompt_file prompt.md --system_prompt_file system.md --output_file dialogue.json
-
-[12月.json] と同じような構造を持ったjsonが出力されれば成功です。
-
-
-## 利用API
+# 利用API
 
 このプロジェクトは「にじボイス」を使用しています。
 
@@ -78,7 +63,7 @@ class MP3Generator:
 https://nijivoice.com/
 
 
-## ライセンス
+# ライセンス
 
 このプロジェクトはMITライセンスの下で公開されています。詳細については、LICENSEファイルを参照してください。
 

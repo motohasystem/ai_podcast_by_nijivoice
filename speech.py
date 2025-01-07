@@ -18,6 +18,7 @@ if __name__ == "__main__":
     input_json = sys.argv[1]
     output_dir = sys.argv[2]
 
+    # にじボイスのキャラクターIDとスピーカー名のマッピングを作成します。
     speaker_id_map = {
         "Jelly": config.ID_CHAR_01,
         "Grreka": config.ID_CHAR_02,
